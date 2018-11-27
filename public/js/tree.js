@@ -1,0 +1,10 @@
+{{--<th scope="col" width="1%">ID</th>--}}
+    {{--<th scope="col" width="5%">UID</th>--}}
+        {{--<th scope="col" width="15%">手机号</th>--}}
+            {{--<th scope="col" width="5%">直推</th>--}}
+                {{--<th scope="col" width="10%">父UID</th>--}}
+                    {{--<th scope="col" width="10%">父账号</th>--}}
+                        {{--<th scope="col" width="5%">状态</th>--}}
+                            {{--<th scope="col" width="5%">等级</th>--}}
+                                {{--<th scope="col" width="15%">注册时间</th>--}}
+                                    {{--<th scope="col" width="10%">操作</th>--}}
