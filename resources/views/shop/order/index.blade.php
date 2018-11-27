@@ -103,21 +103,21 @@
                                         <td>{{ \App\Models\ShopOrder::STATUS[$data->status] }}</td>
                                         <td>
 
-                                            <a href="{{ route('order.detail',$data->id) }}" class="btn btn-inverse-info btn-sm" style="margin-right: 3px;">查看详情</a>
+                                            <a href="{{ route('order.detail',$data->id) }}" class="btn btn-inverse-info btn-sm" style="margin-right: 3px;"><i class="mdi mdi-format-list-bulleted menu-icon"></i> 查看详情</a>
                                             <br>
                                             @if($data->status == 'wait_deliver')
-                                                <a href="{{ route('order.ship',$data->id) }}" class="btn btn-inverse-danger btn-sm" style="margin-right: 3px;">订单发货</a>
+                                                <a href="{{ route('order.ship',$data->id) }}" class="btn btn-inverse-danger btn-sm" style="margin-right: 3px;"><i class="mdi mdi-check-circle-outline"></i> 订单发货</a>
                                                 <br>
                                             @endif
                                             @if($data->status == 'wait_collect')
-                                                <a href="{{ route('order.express_kd',$data->id) }}" class="btn btn-inverse-success btn-sm" style="margin-right: 3px;">物流详情</a>
+                                                <a href="{{ route('order.express_kd',$data->id) }}" class="btn btn-inverse-success btn-sm" style="margin-right: 3px;"><i class="mdi mdi-dropbox"></i> 物流详情</a>
                                                 <br>
                                             @endif
                                             @if($data->status == 'wait_deliver' || $data->status == 'wait_collect')
                                                 <form action="{{ route('order.cancel',$data->id) }}" method="post">
                                                     {{ csrf_field() }}
                                                     {{ method_field('POST') }}
-                                                    <button type="submit" class="btn btn-inverse-warning btn-sm">取消订单</button>
+                                                    <button type="submit" class="btn btn-inverse-warning btn-sm"><i class="mdi mdi-close-circle-outline"></i> 取消订单</button>
                                                 </form>
                                             @endif
                                         </td>

@@ -15,6 +15,6 @@ class Node extends Model
 {
     protected $table = 'market_valid_nodes';
     protected $primaryKey = 'id';
-    protected $fillable = ['uid','invited_uid','created_at','update_at'];
+    protected $fillable = ['uid','invited_uid','created_at','updated_at'];
 
 }

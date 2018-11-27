@@ -165,7 +165,7 @@ class UsersController extends Controller
             return view('users.edit')->with(['user'=>$user,'account'=>$account,'msg'=>'新手机号已被使用']);
         }
         $status = $request->status;
-        
+
         $user->account=$account;
         $user->mobile=$account;
         $user->status=$status;
@@ -178,7 +178,11 @@ class UsersController extends Controller
         $level_save = Muser::changeLevel($id,$level);
         return redirect('users')->with('flash_message','修改成功');
     }
-    
+    public function userRelation(Request $request){
+//        dd($request->segment(2));
+        return view('users.relation');
+    }
+
     public function lock_line(Request $request){
         $id = $request->id;
         $user = User::query()->find($id);
@@ -195,7 +199,7 @@ class UsersController extends Controller
             return json_encode(-1);
         }
     }
-    
+
     public function show(User $user){
         $info = User::query()->find($user->id);
         return view('users.move',['user'=>$info]);
@@ -227,9 +231,9 @@ class UsersController extends Controller
         }
         $data = ['uid'=>$new_user->id,'username'=>$new_user->username,'mobile'=>$new_user->mobile];
         return json_encode($data);
-        
+
     }
-    
+
     public function move_line(Request $request){
         $id = $request->id;
         $uid = $request->uid;
@@ -260,14 +264,14 @@ class UsersController extends Controller
         if(in_array($new_user->id,$id_str)){
             return view('users.move',['user'=>$user,'msg'=>'新推荐人是你的下线,不能移线']);
         }
-        
+
         DB::beginTransaction();
         try{
             // 3.修改当前用户的pid值
             $user->pid = $new_user->id;
             $user->save();
             // 4.修改当前用户及其所有下级的path值
-    
+
             //所有下级用户path更新  新推荐人path后加.
             DB::update(
                 'update datc_users set path=REPLACE(path,:old_Path,:new_path) where id = :id or pid = :pid or path like :self_path',
@@ -281,7 +285,7 @@ class UsersController extends Controller
             return view('users.move',['user'=>$user,'msg'=>'移线失败']);
 
         }
-        
+
     }
 
     //用户等级设置
@@ -347,9 +351,49 @@ class UsersController extends Controller
         }
 
         $data = $user->first();
-        
+
 //        dd($data);
         return $data;
     }
+
+    public function treeList(Request $request){
+        $params = $request->all();
+        if(!isset($params['id'])){
+            $user = User::query()
+                ->select('id as nodeId','mobile as text','username')
+                //
+                ->where('pid','<',100)
+                //去掉前100用户
+                ->where('id','>=',100)
+                //去掉机器人
+                ->where('mobile','not like','11'.'%')
+                ->where('mobile','not like','12'.'%')
+                ->get()->toArray();
+//            foreach ()
+            foreach ($user as $k => $v){
+                $child_count = User::query()
+                    ->where('mobile','not like','11'.'%')
+                    ->where('mobile','not like','12'.'%')
+                    ->where('path','like','%'.','.$v['nodeId'].','.'%')
+                    ->where('id','>=',0)
+                    ->count();
+                $user[$k]['text'] = $v['text'].'（'.$v['username'].'）'.'---'.'  '.'[人数：'.$child_count.']';
+            }
+//            dd($user);
+        }else{
+            $user = User::query()
+                ->where('mobile','not like','11'.'%')
+                ->where('mobile','not like','12'.'%')
+                ->where('id','>=',100)
+                ->where('pid',$params['id'])->get()->toArray();
+            foreach ($user as $k => $v){
+                $user[$k]['nodeId'] = $v['id'];
+                $child_count = User::query()->where('path','like','%'.','.$v['id'].','.'%')->count();
+                $user[$k]['text'] = $v['mobile'].'（'.$v['username'].'）'.'---'.' '.'[人数：'.$child_count.']';
+            }
+        }
+        return json(200,'查询成功',$user);
+    }
+
 }
 

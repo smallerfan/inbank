@@ -81,11 +81,7 @@
                                         <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
                                             <a href="{{ route('banners.edit', $data)}}" class="btn btn-sm btn-gradient-dark btn-icon-text" style="margin-right: 3px">编辑
                                                 <i class="mdi mdi-file-check btn-icon-append"></i></a>
-
-
-                                            {{--{!! Form::open(['method' => 'DELETE', 'route' => ['banners.destroy', $data->id] ]) !!}--}}
                                             <span class="btn btn-sm btn-gradient-danger btn-icon-text" onclick="del({{ $data->id }})"><i class="mdi mdi-delete btn-icon-prepend"></i>删除</span>
-                                            {{--{!! Form::close() !!}--}}
                                         </div>
 
                                     </td>

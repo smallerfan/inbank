@@ -43,6 +43,11 @@ class C2cUserAuthController extends Controller
             $datas = C2cUserAuth::query()->with("user")->where($data)->orderBy('status', 'desc')->orderBy('id', 'asc')->paginate(10);
 //            dd($datas);
         }
+        $datas = $datas->appends([
+            'status'=>$status,
+            'key'=>$key,
+            'value'=>$value,
+        ]);
         return view('c2c_user_authes.index', ['datas' => $datas,'value'=>$value,'key'=>$key,'status'=>$status]);
     }
 

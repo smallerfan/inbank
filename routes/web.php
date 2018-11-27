@@ -57,6 +57,7 @@ Route::group(['middleware'=>'rbac'], function () use($router) {
     $router->post('logout', 'Auth\LoginController@logout')->name('auth.logout');
 
     $router->post('users/lock/{id}', 'UsersController@lock')->where(['id' => '[0-9]+'])->name('users.lock');
+    Route::post('users/tree_list', 'UsersController@treeList')->name('users.tree_list');
     $router->post('users/check_line', 'UsersController@check_line')->name('users.check_line');
     $router->post('users/lock_line', 'UsersController@lock_line')->name('users.lock_line');
     $router->get('users/show/{id}', 'UsersController@show')->where(['id' => '[0-9]+'])->name('users.show');
@@ -65,6 +66,8 @@ Route::group(['middleware'=>'rbac'], function () use($router) {
 
     $router->resource("users", 'UsersController');
     $router->post("user/user_find", 'UsersController@userFind')->name('user.user_find');
+    $router->get("user/user_relation", 'UsersController@userRelation')->name('user.user_relation');
+
 
     //用户等级管理
     $router->any("user/user_level/index", 'UsersController@userLevel')->name('user_level.index');
@@ -92,6 +95,8 @@ Route::group(['middleware'=>'rbac'], function () use($router) {
     $router->resource("extract", 'ExtractController');
     $router->get('extract/lists/{flag}', 'ExtractController@lists')->name("extract.lists");
     $router->post("extract/update", 'ExtractController@update')->name('extract.update');
+    $router->resource("withdraw", 'WithdrawController');
+    $router->post("withdraw/update", 'WithdrawController@update')->name('withdraw.update');
     //商城
     $router->group(array('prefix' => 'shop', 'namespace' => 'Shop'), function() use ($router) {
         //物流管理

@@ -7,6 +7,11 @@
         img{width: 280px;height: 170px;}
         p{font-weight: bold;font-size: 14px;}
         .remark{display: none;}
+        .form-group {
+            display: inline-block;
+            margin-left: 25px;
+            margin-bottom: 1.5rem;
+        }
     </style>
     <div class="main-panel">
         <div class="content-wrapper">
@@ -30,30 +35,32 @@
                         <div class="card-body">
                             <h4 class="card-title">用户详情——{{ $auth->name }}</h4>
                             <p></p>
-                            <div class="form-group col-lg-6">
+                            <br>
+                            <div style="width: 45%">
                                 <blockquote class="blockquote blockquote-primary">
+                                <div class="form-group">
                                 <p>姓名:</p>
                                 {{ $auth->name }}
-                                </blockquote>
                             </div>
 
-                            <div class="form-group col-lg-6">
-                                <blockquote class="blockquote blockquote-primary">
+                            <div class="form-group">
                                 <p>手机号:</p>{{ $auth->mobile }}
-                                </blockquote>
                             </div>
-                            <div class="form-group col-lg-6">
-                                <blockquote class="blockquote blockquote-primary">
+                            <div class="form-group">
                                 <p>身份证号:</p>{{ $auth->id_number }}
+                            </div>
                                 </blockquote>
                             </div>
-                            <div class="form-inline" style="margin: 100px 0">
+                            <div class="form-inline" style="margin: 50px 0">
 
-                            <div class="form-group col-lg-6">
+                            <div class="form-group col-lg-6" style="margin-left: 10px">
                                 <p>身份证正面照:</p><img src="{{ config('accessurl.ACCESS_URL').$auth->id_photo_face }}">
                             </div>
-                            <div class="form-group col-lg-6">
+                            <div class="form-group col-lg-6" style="margin-top: 20px;margin-left: 10px">
                                 <p>身份证反面照:</p><img src="{{ config('accessurl.ACCESS_URL').$auth->id_photo_back }}">
+                            </div>
+                            <div class="form-group col-lg-12" style="margin-top: 20px;margin-left: 10px">
+                                <p>身份证手持照:</p><img src="{{ config('accessurl.ACCESS_URL').$auth->id_photo_hand }}">
                             </div>
                             </div>
 
@@ -90,7 +97,7 @@
                             @endif
                             @if($auth->is_pass() || $auth->is_reject() || $auth->is_disable())
                                 <div class="form-group">
-                                    <p>审核结果:</p>{{ \App\Models\C2cUserAuth::STATUS[$auth->status] }}
+                                    <p>审核结果:</p><label class="badge badge-danger">{{ \App\Models\C2cUserAuth::STATUS[$auth->status] }}</label>
                                 </div>
                                 @if($auth->is_reject() || $auth->is_disable())
                                     <div class="form-group">

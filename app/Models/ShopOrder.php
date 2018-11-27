@@ -12,17 +12,17 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ShopOrder extends Model{
     use SoftDeletes;
-
+    
     protected $table="market_orders";
     protected $fillable = ['id','code','shoper_id','buy_num','price','express_fee','amount','buy_uid','uname','tel',
         'country','province','city','county','province_name','city_name','county_name','address','express_name',
         'express_sn','pay_method','coin_value','remark','created_at','updated_at','buyer_deleted_at',
         'seller_deleted_at','appeal_deadline','delivered_at','delivered_status'];
-
-
+    
+    
     const STATUS = ['close'=>'已关闭','wait_deliver'=>'待发货','wait_collect'=>'待收货','complete'=>'已完成','appeal'=>'申诉'];
     const DELIVER_STATUS = [0=>'待发货',1=>'已发货'];
-
+    
     public function users(){
         return $this->belongsTo('App\Models\User','buy_uid','id');
     }
@@ -35,17 +35,24 @@ class ShopOrder extends Model{
     public function order_goods(){
         return $this->belongsToMany('App\Models\Goods','market_order_details','order_id','goods_id');
     }
-
-
-
-    public static function orderList($params,$type){
-
+    public static function orderList($params,$type = 0){
+        
         $order = ShopOrder::query()->with('order_goods')->with('users')->with('order_detail');
-        if(isset($params['status'])){
-            $order->where('status',$params['status']);
+        
+        if($type == 0){
+            if(isset($params['status'])){
+                $order->where('status',$params['status']);
+            }else{
+                $params['status'] = null;
+            }
         }else{
-            $params['status'] = null;
+            if(isset($params['status'])){
+                $order->where('delivered_status',$params['status']);
+            }else{
+                $params['status'] = null;
+            }
         }
+        $order->where('order_type','=',$type);
         if(isset($params['code'])){
             $order->where('code',$params['code']);
         }else{
@@ -61,11 +68,7 @@ class ShopOrder extends Model{
         }else{
             $params['tel'] = null;
         }
-        if(!isset($type)){
-            $type = 0;
-        }
-        $order->where('order_type','=',$type);
-
+        
         $list = $order->orderByDesc('created_at')
             ->paginate(10);
 //            $a = [];
@@ -91,7 +94,7 @@ class ShopOrder extends Model{
         $ship -> status = 'wait_collect';
         $res = $ship->save();
         return $res;
-
+        
     }
     public static function editCreditShip($params){
         $ship = ShopOrder::find($params['id']);
@@ -101,7 +104,7 @@ class ShopOrder extends Model{
         $ship -> delivered_status = 1;
         $res = $ship->save();
         return $res;
-
+        
     }
     public static function editExpress($params){
         $ship = ShopOrder::find($params['id']);
@@ -125,5 +128,5 @@ class ShopOrder extends Model{
             ->find($id);
         return $order;
     }
-
+    
 }

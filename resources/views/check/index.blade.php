@@ -64,45 +64,45 @@
                                 @foreach ($data as $d)
                                     <tr>
                                         <td>
-                                            {{$d['order_sn']}}
+                                            {{$d->order_sn}}
                                         </td>
                                         <td>
-                                            {{$d['trans_coin']}}
+                                            {{$d->trans_coin}}
                                         </td>
                                         <td>
-                                            <label>姓名: {{ $d['user']['username'] }}</label>
-                                            <label>uid: {{ $d['user']['invite_code']  }}</label>
-                                            <label>手机: {{ $d['user']['mobile']  }}</label>
+                                            <label>姓名: {{ $d->user->username }}</label>
+                                            <label>uid: {{ $d->user->invite_code }}</label>
+                                            <label>手机: {{ $d->user->mobile  }}</label>
                                         </td>
                                         <td>
-                                            <label>姓名: {{ $d['publish_order']['user']['username'] }}</label>
-                                            <label>uid: {{ $d['publish_order']['user']['invite_code']  }}</label>
-                                            <label>手机: {{ $d['publish_order']['user']['mobile']  }}</label>
+                                            <label>姓名: {{ $d->publish_order->user->username }}</label>
+                                            <label>uid: {{ $d->publish_order->user->invite_code}}</label>
+                                            <label>手机: {{ $d->publish_order->user->mobile }}</label>
                                         </td>
                                         <td>
-                                            (<label>{{\App\Models\InPayment::PAY_TYPE[ $d['publish_order']['payment']['pay_type'] ]}}</label>)
-                                            <label>{{ $d['publish_order']['payment']['card_no'] }}</label>
+                                            (<label>{{\App\Models\InPayment::PAY_TYPE[ $d->publish_order->payment->pay_type ]}}</label>)
+                                            <label>{{ $d->publish_order->payment->card_no }}</label>
                                         </td>
                                         <td>
-                                            {{$d['trans_num']}}
+                                            {{$d->trans_num}}
                                         </td>
                                         <td>
-                                            {{$d['amount']}}
+                                            {{$d->amount}}
                                         </td>
                                         <td>
-                                            {{$d['created_at']}}
+                                            {{$d->created_at}}
                                         </td>
                                         <td>
-                                            {{$d['updated_at']}}
+                                            {{$d->updated_at}}
                                         </td>
                                         <td>
-                                            {{ \App\Models\C2cTransOrder::STATUS[$d['status']]}}
+                                            {{ \App\Models\C2cTransOrder::STATUS[$d->status]}}
                                         </td>
 
                                         {{--<td>{{ \App\Models\C2cUser::STATUS[$data->status] }}</td>--}}
                                         <td>
                                             <div class="form-inline" role="group" aria-label="Button group with nested dropdown" >
-                                                @if($d['status'] === 'wait_confirm')
+                                                @if($d->status === 'wait_confirm')
                                                     <a class="btn btn-gradient-success btn-sm" style="margin-right: 3px;margin-bottom: 10px;" onClick="complete({{$d['id']}})">确认收款</a>
                                                 @endif
                                                 <a class="btn btn-gradient-warning btn-sm" style="margin-right: 3px;" onClick="cancel({{$d['id']}})">关闭订单</a>
@@ -113,7 +113,7 @@
                                 </tbody>
                             </table>
                             <br>
-                            {{ $data->render() }}
+                            {{ $data->links() }}
                         </div>
                     </div>
                 </div>

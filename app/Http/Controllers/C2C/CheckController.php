@@ -24,37 +24,22 @@ class CheckController extends Controller
 {
     public function index(Request $request){
         $params = $request->all();
-        $page = isset($params['page']) ? $params['page']:1;
-        if(empty($params['status'])){
-            $order = C2cTransOrder::query()->with('user')->with('publish_order.user')->with('publish_order.payment')->orderByDesc('created_at')
-                ->get()
-                ->filter(function ($item) {
-                return substr($item->publish_order->user->mobile,0,2) == 11 || substr($item->publish_order->user->mobile,0,2) == 12;
-            })->toArray();
-            $res = fen_ye($page,$order);
-//            dd($paginator);
-//            $a = [];
-//            foreach ($order as $k => $v){
-//                if(empty($v->publish_order->payment)){
-//                    $a[] = $v;
-//                }
-//            }
-//            dd($a);
-            return view('check.index')->with('data',$res);
+        $order = C2cTransOrder::query();
+        if(!empty($params['status'])){
+            $order->where('status','=',$params['status']);
         }else{
-            $order = C2cTransOrder::query()->with('user')->with('publish_order.user')->with('publish_order.payment')
-                ->where('status','=',$params['status'])
-                ->get()
-                ->filter(function ($item) {
-                    return substr($item->publish_order->user->mobile,0,2) == 11 || substr($item->publish_order->user->mobile,0,2) == 12;
-                })->toArray();
-            $res = fen_ye($page,$order);
-//                ->paginate(10);
-//            $order = $order->appends([
-//                'status'=>$params['status'],
-//            ]);
-            return view('check.index')->with('data',$res);
+            $params['status'] = null;
         }
+            $res = $order->with('user')->whereHas('publish_order.user',function ($q){
+                $q->where('mobile','like','11'.'%')->orwhere('mobile','like','12'.'%');
+            })->with('publish_order.payment')
+
+                ->paginate(10);
+//        dd($res);
+        $res = $res->appends([
+            'status'=>$params['status'],
+        ]);
+            return view('check.index')->with('data',$res);
     }
     public function complete(Request $request){
         $params = $request->all();

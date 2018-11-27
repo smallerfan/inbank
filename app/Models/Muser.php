@@ -15,7 +15,7 @@ class Muser extends Model
 {
     protected $table = 'market_users';
     protected $primaryKey = 'id';
-    protected $fillable = ['uid','invited_uid','level','pid','path','member_time','member_expire','created_at','update_at'];
+    protected $fillable = ['uid','invited_uid','level','pid','path','member_time','member_expire','created_at','updated_at'];
 
     public function user(){
         return $this->belongsTo('App\Models\User','uid','id');

@@ -119,7 +119,8 @@
                                                 {{--@endif--}}
                                                 {{--@if (!$user->is_deleted())--}}
                                                 {{--<a class="btn btn-link" href="{{ route('user_riches.dk_logs', $user) }}">财富明细</a>--}}
-                                                <a class="btn btn-sm btn-gradient-dark btn-icon-text" href="{{ route('users.edit', $user) }}">编辑</a>
+                                                <a href="{{ route('users.edit', $user) }}" class="btn btn-sm btn-gradient-dark btn-icon-text" style="margin-right: 3px">编辑
+                                                    <i class="mdi mdi-file-check btn-icon-append"></i></a>
                                                 <form action="{{ route('users.destroy', $user) }}" method="post">
                                                     {{ csrf_field() }}
                                                     {{ method_field('DELETE') }}

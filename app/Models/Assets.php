@@ -15,6 +15,6 @@ class Assets extends Model
 {
     protected $table = 'market_assets';
     protected $primaryKey = 'id';
-    protected $fillable = ['uid','muid','history_award','live_assets','shopping_assets','created_at','update_at'];
+    protected $fillable = ['uid','muid','history_award','live_assets','shopping_assets','created_at','updated_at'];
 
 }
