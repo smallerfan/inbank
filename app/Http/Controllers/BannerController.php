@@ -8,7 +8,6 @@ use App\Facades\UploadedFile;
 class BannerController extends Controller
 {
     public function index(){
-//        dd(config('filesystems.disks.qiniu.domain'));
         $datas = Banner::query()->orderByDesc('sort')->paginate(5);
         return view('banners.index',['datas'=>$datas]);
     }
@@ -16,69 +15,116 @@ class BannerController extends Controller
         return view('banners.create');
     }
     public function store(Request $request){
-        $this->validate($request,
+        $params = $request->all();
+//        dd($params);
+        $validator = \Validator::make($params,
             [
                 'title'=>'required|max:40',
                 'href'=>'nullable|max:100',
                 'type'=>'required|in:0,1',
-                'picture' =>'required|file',
-                'status' =>'required|in:open,close|string',
+                'picture' =>'required',
+                'status' =>'required',
                 'sort' =>'required|numeric|min:0',
+            ],[
+                'required' => ':attribute必填',
+                'numeric' => ':attribute数值',
+                'min' => ':attribute最小',
+                'max' => ':attribute最大',
+                'in' => ':attribute范围',
+            ],[
+                'title'=>'标题',
+                'href'=>'链接',
+                'type'=>'类型',
+                'picture' =>'图片',
+                'status' =>'状态',
+                'sort' =>'排序',
             ]);
-        if ($request->hasFile('picture')) {
-            $picture = UploadedFile::file('picture')->store();
+        if($validator->fails()){
+            return $this->json(500,$validator->messages()->first());
         }
-        Banner::query()->create([
+
+        $res = Banner::query()->create([
             'title' => $request->title,
             'href' => $request->href,
             'type' => $request->type,
-            'picture' =>$picture,
+            'picture' =>$request->picture,
             'status' =>$request->status,
             'sort' =>$request->sort,
         ]);
-        return redirect()->route("banners.index")->with('flash_message','添加成功');
+        if($res){
+            return $this->json(200,'添加成功');
+        }else{
+            return $this->json(500,'添加失败');
+        }
     }
     
     public function edit(Banner $banner){
         $data = Banner::query()->find($banner->id);
+//        dd($data);
         return view('banners.edit',['data'=>$data]);
     }
 
     public function update(Request $request){
-        $this->validate($request,
+        $params = $request->all();
+//        dd($params);
+//        dd($params);
+        $validator = \Validator::make($params,
             [
                 'title'=>'required|max:40',
                 'href'=>'nullable|max:100',
                 'type'=>'required|in:0,1',
-                'id'=>'required|numeric',
-                'picture' =>'nullable|file',
-                'status' =>'required|in:open,close|string',
+//                'picture' =>'required',
+                'status' =>'required',
                 'sort' =>'required|numeric|min:0',
+            ],[
+                'required' => ':attribute必填',
+                'numeric' => ':attribute数值',
+                'min' => ':attribute最小',
+                'max' => ':attribute最大',
+                'in' => ':attribute范围',
+            ],[
+                'title'=>'标题',
+                'href'=>'链接',
+                'type'=>'类型',
+//                'picture' =>'图片',
+                'status' =>'状态',
+                'sort' =>'排序',
             ]);
+        if($validator->fails()){
+            return $this->json(500,$validator->messages()->first());
+        }
+
         $id = $request->id;
+        if($params['picture'] != null){
+            $update_data = [
+                'title' => $request->title,
+                'href' => $request->href,
+                'type' => $request->type,
+                'status' =>$request->status,
+                'picture' =>$request->picture,
+                'sort' =>$request->sort,
+            ];
+        }else{
+            $update_data = [
+                'title' => $request->title,
+                'href' => $request->href,
+                'type' => $request->type,
+                'status' =>$request->status,
+                'sort' =>$request->sort,
+            ];
+        }
+
+//        dd($update_data);
     
         $banner = Banner::query()->find($id);
-        if ($request->hasFile('picture')) {
-            $picture = UploadedFile::file('picture')->store();
-            $banner->where('id',$request->id)->update([
-                'title' => $request->title,
-                'href' => $request->href,
-                'type' => $request->type,
-                'picture' =>$picture,
-                'status' =>$request->status,
-                'sort' =>$request->sort,
-            ]);
+        $res = $banner->where('id',$request->id)->update($update_data);
+        if($res){
+
+            return $this->json(200,'修改成功');
         }else{
-            $banner->where('id',$request->id)->update([
-                'title' => $request->title,
-                'href' => $request->href,
-                'type' => $request->type,
-                'status' =>$request->status,
-                'sort' =>$request->sort,
-            ]);
+            return $this->json(500,'修改失败');
         }
-        
-        return redirect()->route("banners.index")->with('flash_message','保存成功');
+//        return redirect()->route("banners.index")->with('flash_message','保存成功');
     }
     public function delete(Request $request){
         $id = $request->input('id');

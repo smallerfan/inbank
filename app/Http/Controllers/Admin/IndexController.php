@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
+
+use App\Facades\UploadedFile;
 use App\Utility\Video;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -10,9 +12,16 @@ use App\Models\Assets;
 use App\Models\AssetsLog;
 use App\models\ShopOrder;
 use App\Models\User;
+use Qiniu\Auth;
+use Qiniu\Storage\BucketManager;
 
 class IndexController extends Controller
 {
+    public function __construct()
+    {
+        $this->auth = new Auth(config('filesystems.disks.qiniu.access_key'),config('filesystems.disks.qiniu.secret_key'));
+        $this->backetManager = new BucketManager($this->auth);
+    }
     public function index()
     {
         $admin = session('admin');
@@ -120,13 +129,14 @@ class IndexController extends Controller
                 {
                     return $this->json(500,'文件类型不正确！');
                 }
-                $realPath = $file->getRealPath();   //临时文件的绝对路径
-                // 上传文件
-                $filename = $path.date('Ymd').'/'.uniqid() . '.' . $ext;
+//                $realPath = $file->getRealPath();   //临时文件的绝对路径
+//                // 上传文件
+//                $filename = $path.date('Ymd').'/'.uniqid() . '.' . $ext;
                 // 使用我们新建的uploads本地存储空间（目录）
-                $bool = Storage::disk('admin')->put($filename, file_get_contents($realPath));
-                if($bool){
-                    return $this->json(200,'上传成功',['filename'=>'/uploads/'.$filename]);
+                $img_main = UploadedFile::file('image')->store();
+//                $bool = Storage::disk('admin')->put($filename, file_get_contents($realPath));
+                if($img_main){
+                    return $this->json(200,'上传成功',['filename'=>$img_main,'domain' => config('filesystems.disks.qiniu.domain')]);
                 }else{
                     return $this->json(500,'上传失败！');
                 }
@@ -145,18 +155,20 @@ class IndexController extends Controller
      */
     public function wangeditorUpload(Request $request)
     {
+//        dd(1111);
         $file = $request->file('wangEditorH5File');
         if($file){
             if($file->isValid()) {
                 // 获取文件相关信息
-                $ext = $file->getClientOriginalExtension();     // 扩展名
-                $realPath = $file->getRealPath();   //临时文件的绝对路径
-                // 上传文件
-                $filename = date('Ymd') . '/' . uniqid() . '.' . $ext;
-                // 使用我们新建的uploads本地存储空间（目录）
-                $bool = Storage::disk('admin')->put('/wangeditor/'.$filename, file_get_contents($realPath));
-                if($bool){
-                    echo asset('/uploads/wangeditor/'.$filename);
+//                $ext = $file->getClientOriginalExtension();     // 扩展名
+//                $realPath = $file->getRealPath();   //临时文件的绝对路径
+//                // 上传文件
+//                $filename = date('Ymd') . '/' . uniqid() . '.' . $ext;
+//                // 使用我们新建的uploads本地存储空间（目录）
+                $img_main = UploadedFile::file('wangEditorH5File')->store();
+//                $bool = Storage::disk('admin')->put('/wangeditor/'.$filename, file_get_contents($realPath));
+                if($img_main){
+                    echo asset($img_main);
                 }else{
                     echo 'error|上传失败';
                 }

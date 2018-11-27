@@ -12,6 +12,6 @@ class Banner extends Model
     const STATUS = ['open'=>'启用','close'=>'禁用'];
     public function getPictureAttribute($value)
     {
-        return config('filesystems.disks.qiniu.domain') .'/'. ltrim($value);
+        return config('filesystems.disks.qiniu.domain') .''. ltrim($value);
     }
 }

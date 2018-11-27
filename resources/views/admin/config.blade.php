@@ -71,7 +71,7 @@
                                         <td class="len">
                                             @if($v->type == "image")
                                                 <div>
-                                                    <img src="{{ $v->config_value }}" class="config-img" alt="">
+                                                    <img src="{{ config('filesystems.disks.qiniu.domain').$v->config_value }}" class="config-img" alt="">
                                                 </div>
                                             @else
                                                 {{ $v->config_value }}

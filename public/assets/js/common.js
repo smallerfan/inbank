@@ -22,7 +22,7 @@ $('.img-file').on("change",function(){
         success:function(res){
             layer.close(index);
             if(res.code == 200){
-                _this.parents('.form-group').find('.img-yl').empty().append('<img src="'+res.data.filename+'">').show();
+                _this.parents('.form-group').find('.img-yl').empty().append('<img src="'+res.data.domain+res.data.filename+'">').show();
                 _this.parents('.form-group').find('.image-path').val(res.data.filename);
                 _this.parents('.form-group').find('.file-upload-info').val(res.data.filename);
             }else{

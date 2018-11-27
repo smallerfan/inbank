@@ -26,7 +26,7 @@
                             <h4 class="card-title">编辑轮播图 -- {{ $data->title }}</h4>
                             </p>
                             <br>
-                            {{ Form::open(array('url' => route('banners.update'),'enctype'=>"multipart/form-data")) }}
+                            {{ Form::open(array('url' => route('banners.update'),'enctype'=>"multipart/form-data",'id'=>'form')) }}
                             {{ csrf_field() }}
                             {{ Form::hidden('id', $data->id) }}
                             <div class="form-group">
@@ -48,13 +48,28 @@
                                     </label>
                                 </div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group" id="image">
                                 <label>图片</label>
-                                <label for="file">
-                                    <img src="{{ $data->picture }}" width="140px" height="80px"  id="img">
-                                </label>
-                                <input type="file" name="picture" value="{{ $data->picture }}" style="display: none;" id="file" onchange="show(this.files)">
+                                <input type="file" class="file-upload-default img-file" data-path="avatar">
+                                {{--{{$data->picture}}--}}
+                                <input type="hidden" class="image-path value-input" name="picture">
+                                <div class="input-group col-xs-12">
+                                    <input type="text" class="form-control file-upload-info" disabled="" value="{{$data->picture}}">
+                                    <span class="input-group-append">
+                                                <button class="file-upload-browse btn btn-gradient-primary" onclick="upload($(this))" type="button">上传</button>
+                                    </span>
+                                </div>
+                                <div class="img-yl" style="display: block;">
+                                    <img src="{{$data->picture}}" alt="">
+                                </div>
                             </div>
+                            {{--<div class="form-group">--}}
+                                {{--<label>图片</label>--}}
+                                {{--<label for="file">--}}
+                                    {{--<img src="{{ $data->picture }}" width="140px" height="80px"  id="img">--}}
+                                {{--</label>--}}
+                                {{--<input type="file" name="picture" value="{{ }}" style="display: none;" id="file" onchange="show(this.files)">--}}
+                            {{--</div>--}}
 
                             <div class="form-group">
                                 {{ Form::label('href', '链接') }}
@@ -80,7 +95,10 @@
                                 {{ Form::label('sort', '排序(数值越大越靠前)') }}
                                 {{ Form::text('sort', 0 , array('class' => 'form-control')) }}
                             </div>
-                            {{ Form::submit('保存', array('class' => 'btn btn-primary')) }}
+                            <button type="button" onclick="commit()" class="btn btn-sm btn-gradient-primary btn-icon-text">
+                                <i class="mdi mdi-file-check btn-icon-prepend"></i>
+                                提交
+                            </button>
 
                             {{ Form::close() }}
                         </div>
@@ -91,18 +109,22 @@
 
     </div>
     <script type="text/javascript">
-        function show(f) {
-            var str = "";
-            for (var i = 0; i < f.length; i++) {
-                var reader = new FileReader();
-                reader.readAsDataURL(f[i]);
-                reader.onload = function (e) {
-                    str += "<img  height='80px' width='140px' id='img' src='" + e.target.result + "'/>";
-                    $("#img")[0].outerHTML = str;
-                }
+        function commit(){
+            if(!checkForm()){
+                return false;
             }
+            var data = $("#form").serializeObject();
+            myRequest("{{ route('banners.update') }}","post",data,function(res){
+                layer.msg(res.msg);
+                if(res.code === 200){
+                    setTimeout(function(){
+                        window.location="/banners";
+                    },1500)
+                }
+            },function(){
+                layer.msg(res.msg, function(){});
+            });
         }
-
     </script>
 
 @endsection

@@ -37,7 +37,7 @@
                                             </span>
                                         </div>
                                         <div class="img-yl" style="display: block;">
-                                            <img src="{{ $res->config_value }}" alt="">
+                                            <img src="{{ config('filesystems.disks.qiniu.domain').$res->config_value }}" alt="">
                                         </div>
                                     </div>
                                 @else
