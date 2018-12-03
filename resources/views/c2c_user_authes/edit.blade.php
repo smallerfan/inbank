@@ -88,7 +88,7 @@
                                     {{--<input type="radio" name="choice" value="reject_approval" onclick="clickItShow()">驳回&emsp;&emsp;--}}
                                 </div>
                                 <div class="form-group remark" id="remark">
-                                    {{ Form::label('remark', '操作凭据') }}
+                                    {{ Form::label('remark', '驳回原因') }}
 
                                     {{ Form::textarea('remark', '', array('class' => 'form-control','rows' => '3')) }}
                                 </div>
@@ -101,7 +101,7 @@
                                 </div>
                                 @if($auth->is_reject() || $auth->is_disable())
                                     <div class="form-group">
-                                        <p>操作凭据:</p>{{ $auth->remark }}
+                                        <p>驳回原因:</p>{{ $auth->remark }}
                                     </div>
                                 @endif
                             @endif

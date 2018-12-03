@@ -43,6 +43,7 @@ class RechargeController extends Controller
                 ->where($where)
                 ->where($data)
                 ->orderByDesc('status')
+                ->orderByDesc('created_at')
                 ->paginate(10);
         }else{
             $datas = RechargeExtract::query()
@@ -51,6 +52,7 @@ class RechargeController extends Controller
                 ->where($where)
                 ->where($data)
                 ->orderByDesc('status')
+                ->orderByDesc('created_at')
                 ->paginate(10);
         }
         $coin = C2cCoin::all();
@@ -70,6 +72,7 @@ class RechargeController extends Controller
             ->where(['operate_type'=>'recharge'])
             ->where($where)
             ->orderByDesc('status')
+            ->orderByDesc('created_at')
             ->paginate(10);
         $coin = C2cCoin::all();
         return view('recharge.index',['datas'=>$datas,'msg'=>$flag,'coin'=>$coin]);
@@ -93,7 +96,7 @@ class RechargeController extends Controller
             $note = $request->note;
             $data->status = 'reject_approval';
             $data->note = $note;
-            $data->approval_uid=session('admin')->id;
+            $data->approval_uid=Auth()->user()->id;
             $data->save();
             return view('recharge.edit',['data'=>$data,'flag'=>$data->c2c_coin->sys_name,'msg'=>'审核成功']);
         }
@@ -104,7 +107,7 @@ class RechargeController extends Controller
                 $coin_num = $request->real_coin_num;
                 $data->status = 'pass_approval';
                 $data->real_coin_num = $coin_num;
-                $data->approval_uid=session('admin')->id;
+                $data->approval_uid=Auth()->user()->id;
                 $data->save();
                 //充值成功  添加资产数据
                 $c2c_user_rich = C2cUserRich::query()

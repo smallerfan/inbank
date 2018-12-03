@@ -183,6 +183,13 @@ Route::group(['middleware'=>'rbac'], function () use($router) {
         $router->post('complete', 'CheckController@complete')->name('check.complete');
 
     });
+    $router->group(array('prefix' => 'data', 'namespace' => 'Data'), function() use ($router) {
+        $router->resource('data', 'DataController');
+        $router->get('goods_sale', 'DataController@goods_sale')->name('data.goods_sale');
+//        Route::get('addUsers', 'DataController@addUsers')->name('addUsers');
+//        Route::get('results', 'DataController@results')->name('results');
+//
+    });
     //轮播图
     $router->resource('banners', 'BannerController');
     $router->post('banners/update', 'BannerController@update')->name('banners.update');

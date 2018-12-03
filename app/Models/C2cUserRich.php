@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class C2cUserRich extends Model
 {
-    protected $fillable = ['uuid', 'coin_id'];
+    protected $fillable = ['id','uuid', 'coin_id','live_num','frozen_num','created_at','updated_at'];
     protected $table = "c2c_user_riches";
 
     public function c2c_user_auth()

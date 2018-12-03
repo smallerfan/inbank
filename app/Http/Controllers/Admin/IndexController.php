@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Facades\UploadedFile;
+use App\Models\Muser;
 use App\Utility\Video;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -51,60 +52,170 @@ class IndexController extends Controller
         }
         return view('admin.index',['menu'=>$menu_list]);
     }
-    public function console()
+    public function console(Request $request)
     {
-        $users = User::query()->where('status','=','enable')->count();
-        $lock = User::query()->where('status','=','lock')->count();
-        $trans_lock = User::query()->where('status','=','trans_lock')->count();
-        $sum['users'] = $users;
-        $sum['lock'] = $lock;
-        $sum['trans_lock'] = $trans_lock;
-        //报单产品订单收益总和
-        $special_order = ShopOrder::query()->whereHas('order_detail.goods',function ($q){
-            $q->where('is_special',1);
-        })->sum('amount');
-        //其他商品订单收益（已完成）
-        $over_order = ShopOrder::query()->whereHas('order_detail.goods',function ($q){
-            $q->where('is_special',0);
-        })->where('status','=','complete')->sum('amount');
-        //已支付未完成的订单收益总和
-        $payed_order = ShopOrder::query()->whereHas('order_detail.goods',function ($q){
-            $q->where('is_special',0);
-        })->where('status','=','wait_collect')->orWhere('status','=','wait_deliver')->sum('amount');
-        //总的用户分红
-        $user_get = Assets::query()->find(0);
-//        dd($user_get);
-        //报单的用户分红
-        $special_user_get = AssetsLog::query()->where('uid',0)->where('award_type',1)->sum('award');
-        //普通商品的用户分红
-        $over_user_get = AssetsLog::query()->where('uid',0)->where('award_type',0)->sum('award');
-        $all_sum = $special_order+$over_order;
-        $sum['special'] = [];
-        $sum['special']['sum'] = abs($special_order);
-        $sum['special']['product_cost'] = abs($special_order*0.1);
-        $sum['special']['operating_cost'] = abs($special_order*0.12);
-        $sum['special']['other'] = abs($special_order*0.78);
-        $sum['special']['user_get'] = abs($special_user_get);
-        $sum['special']['system_get'] = abs($sum['special']['other']-$special_user_get);
-        $sum['over'] = [];
-        $sum['over']['sum'] = abs($over_order);
-        $sum['over']['product_cost'] = abs($over_order*0.1);
-        $sum['over']['operating_cost'] = abs($over_order*0.12);
-        $sum['over']['other'] = abs($over_order*0.78);
-        $sum['over']['user_get'] = abs($over_user_get);
-        $sum['over']['system_get'] = abs($sum['over']['other']-$over_user_get);
-        $sum['all'] = abs($all_sum);
-        $sum['payed'] = abs($payed_order);
-        $sum['all'] = [];
-        $sum['all']['sum'] = abs($all_sum);
-        $sum['all']['product_cost'] = abs($all_sum*0.1);
-        $sum['all']['operating_cost'] = abs($all_sum*0.12);
-        $sum['all']['other'] = abs($all_sum*0.78);
-//        $sum['all']['user_get'] = abs($user_get->history_award);
-//        $sum['all']['system_get'] = abs($sum['all']['other']-$user_get->history_award);
-//        $sum['all'] = abs($all_sum);
-        $sum['payed'] = abs($payed_order);
-        return view('admin.console')->with('sum',$sum);
+        $type = $request->type;
+        if(empty($type)){
+            $type=0;
+        }
+        $times = [
+            ['time'=>'day','count'=>0],
+            ['time'=>'day','count'=>1],
+            ['time'=>'day','count'=>7],
+            ['time'=>'month','count'=>1],
+        ];
+        foreach ($times as $k=>$time){
+            $date = date('Y-m-d',strtotime('-'.$time['count'].' '.$time['time'],time()));
+            if($time['time'] == 'month'){
+                $dayNum = 30;
+            }else{
+                $dayNum = $time['count'];
+            }
+            $data[$k]=$this->order_range_data($date,$dayNum,0);
+            if($time['time'] == 'day'){
+                if($time['count'] == 0){
+                    $data[$k]['tip'] = '今日';
+                }elseif($time['count'] == 1){
+                    $data[$k]['tip'] = '昨日';
+                }else{
+                    $data[$k]['tip'] = '近'.$time['count'].'日';
+                }
+            }else{
+                $data[$k]['tip'] = '近'.$time['count'].'个月';
+            }
+        }
+        foreach ($times as $k=>$time){
+            $date = date('Y-m-d',strtotime('-'.$time['count'].' '.$time['time'],time()));
+            if($time['time'] == 'month'){
+                $dayNum = 30;
+            }else{
+                $dayNum = $time['count'];
+            }
+            $datas[$k]=$this->order_range_data($date,$dayNum,1);
+            if($time['time'] == 'day'){
+                if($time['count'] == 0){
+                    $datas[$k]['tip'] = '今日';
+                }elseif($time['count'] == 1){
+                    $datas[$k]['tip'] = '昨日';
+                }else{
+                    $datas[$k]['tip'] = '近'.$time['count'].'日';
+                }
+            }else{
+                $datas[$k]['tip'] = '近'.$time['count'].'个月';
+            }
+        }
+        //七天交易走势图
+        $trade_data['num'] = [];
+        $trade_data['count'] = [];
+        $trade_data['sum'] = [];
+        $trade_data['amount'] = [];
+        $trade_data1['num'] = [];
+        $trade_data1['count'] = [];
+        $trade_data1['sum'] = [];
+        $trade_data1['amount'] = [];
+        for($i=6;$i>=0;$i--){
+            $trade_date = date('Y-m-d',strtotime('-'.$i.' day',time()));
+            $brokenLine[] = $trade_date;
+            $order=$this->order_data($trade_date,0);
+            array_push($trade_data['num'],$order['num']);
+            array_push($trade_data['count'],$order['count']);
+            array_push($trade_data['sum'],$order['sum']);
+            array_push($trade_data['amount'],$order['amount']);
+        }
+        for($i=6;$i>=0;$i--){
+            $trade_date1 = date('Y-m-d',strtotime('-'.$i.' day',time()));
+            $brokenLine1[] = $trade_date1;
+            $order1=$this->order_data($trade_date1,1);
+            array_push($trade_data1['num'],$order1['num']);
+            array_push($trade_data1['count'],$order1['count']);
+            array_push($trade_data1['sum'],$order1['sum']);
+            array_push($trade_data1['amount'],$order1['amount']);
+        }
+        $data1=$data;
+        $data2=$datas;
+        $types=$brokenLine;
+        $type1=$brokenLine1;
+        $line=$trade_data;
+        $line1=$trade_data1;
+
+        $levels = get_dictionaries_settings('user_level','market');
+        $names=[];
+        $data3 = [];
+        foreach ($levels as $k=>$level){
+            $num = Muser::query()->where('level',$level->dic_item)->count('id');
+            $data3[$k]['value']=$num;
+            $data3[$k]['name']=$level->dic_item_name;
+            array_push($names,$level->dic_item_name);
+        }
+        $data3=json_encode($data3);
+        $levels=json_encode($names);
+
+
+        return view('admin.console')->with(
+            ['datas'=>$data1,'data2'=>$data2,'line'=>json_encode($line),'line1'=>json_encode($line1),'types'=>json_encode($types),'type1'=>json_encode($type1),'flag'=>0,'levels'=>$levels,'data3'=>$data3]
+        );
+//        return view('admin.console')->with('sum',$sum)->with(['datas'=>$data,'levels'=>$levels]);
+    }
+    private function order_data($date,$type=0,$avg = false){
+        if($avg){
+            $data['average'] = ShopOrder::query()
+                ->where('order_type',$type)
+                ->whereDate('created_at',$date)
+                ->avg('amount')?:0.0;
+        }
+        $data['num'] = ShopOrder::query()
+            ->where('order_type',$type)
+            ->whereDate('created_at',$date)
+            ->where('status','!=','close')
+            ->count('id');
+        $data['count'] = ShopOrder::query()
+            ->where('order_type',$type)
+            ->whereDate('created_at',$date)
+            ->where('status','=','complete')
+            ->count('id');
+        $data['sum'] =  ShopOrder::query()
+            ->where('order_type',$type)
+            ->whereDate('created_at',$date)
+            ->where('status','!=','close')
+            ->sum('amount');
+        $data['amount'] = ShopOrder::query()
+            ->where('order_type',$type)
+            ->whereDate('created_at',$date)
+            ->where('status','=','complete')
+            ->sum('amount');
+        return $data;
+    }
+    private function order_range_data($date,$dayNum,$type=0){
+        if($dayNum <= 1){
+            $data = $this->order_data($date,$type,true);
+        }else{
+            $data['average'] = ShopOrder::query()
+                ->where('order_type',$type)
+                ->whereDate('created_at','>=',$date)
+                ->avg('amount')?:0.0;
+            $data['num'] = ShopOrder::query()
+                ->where('order_type',$type)
+                ->whereDate('created_at','>=',$date)
+                ->where('status','!=','close')
+                ->count('id');
+            $data['count'] = ShopOrder::query()
+                ->where('order_type',$type)
+                ->whereDate('created_at','>=',$date)
+                ->where('status','=','complete')
+                ->count('id');
+            $data['sum'] =  ShopOrder::query()
+                ->where('order_type',$type)
+                ->whereDate('created_at','>=',$date)
+                ->where('status','!=','close')
+                ->sum('amount');
+            $data['amount'] = ShopOrder::query()
+                ->where('order_type',$type)
+                ->whereDate('created_at','>=',$date)
+                ->where('status','=','complete')
+                ->sum('amount');
+        }
+
+        return $data;
     }
 
     /**

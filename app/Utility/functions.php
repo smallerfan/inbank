@@ -110,23 +110,17 @@ function fen_ye($page,$data){
     ]);
     return $paginator;
 }
-if (! function_exists('get_setting_value')) {
     /**
      * 根据key获取setting
      *
      * @param $key
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|null|object
      */
-    function get_setting_value($key, $module = null, $default = null)
-    {
-        $settingValue = \App\Models\Setting::query()->where('config_key', $key);
-
-        if (! empty($module)) {
-            $settingValue = $settingValue->where('module', $module);
-        }
-
-        $settingValue = $settingValue->value('config_value');
-
-        return $settingValue ?: $default;
-    }
+function get_dictionaries_settings($type,$module)
+{
+    $where = ['module'=>$module, 'dic_type'=>$type];
+    return \App\Models\Dictionaries::query()
+        ->where($where)
+        ->select('dic_item','dic_item_name')
+        ->get();
 }

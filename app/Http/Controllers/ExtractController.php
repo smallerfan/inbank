@@ -43,6 +43,8 @@ class ExtractController extends Controller
                 ->where(['operate_type'=>'extract'])
                 ->where($where)
                 ->where($data)
+                ->orderByDesc('status')
+                ->orderByDesc('created_at')
                 ->paginate(10);
         }else{
             $datas = RechargeExtract::query()
@@ -50,6 +52,8 @@ class ExtractController extends Controller
                 ->where(['operate_type'=>'extract'])
                 ->where($where)
                 ->where($data)
+                ->orderByDesc('status')
+                ->orderByDesc('created_at')
                 ->paginate(10);
         }
         $coin = C2cCoin::all();
@@ -69,6 +73,7 @@ class ExtractController extends Controller
             ->where(['operate_type'=>'extract'])
             ->where($where)
             ->orderByDesc('status')
+            ->orderByDesc('created_at')
             ->paginate(10);
         $coin = C2cCoin::all();
         return view('extract.index',['datas'=>$datas,'msg'=>$flag,'coin'=>$coin]);
@@ -100,18 +105,22 @@ class ExtractController extends Controller
                 $data->note = $note;
 //                $data->approval_uid=Auth()->id;
                 $data->save();
-                $c2c_user_rich->increment('live_num',$sum_num);
-                $c2c_user_rich->decrement('frozen_num',$sum_num);
-                $c2c_user_rich->save();
+                //避免 负值
+                if($c2c_user_rich->frozen_num >= $sum_num){
+                    $c2c_user_rich->live_num = $c2c_user_rich->live_num+$sum_num;
+                    $c2c_user_rich->frozen_num = $c2c_user_rich->frozen_num-$sum_num;
+                    $c2c_user_rich->save();
+                }
             }
             if ($status == 'pass') {
                 $data->status = 'pass_approval';
 //                $data->approval_uid=Auth()->id;
                 $data->save();
                 //提取成功  剔除冻结的提取数量
-                $c2c_user_rich->decrement('frozen_num', $sum_num);
-                $c2c_user_rich->save();
-                
+                if($c2c_user_rich->frozen_num >= $sum_num) {
+                    $c2c_user_rich->frozen_num = $c2c_user_rich->frozen_num-$sum_num;
+                    $c2c_user_rich->save();
+                }
                 // 充值日志
                 $log = [
                     'uuid' => $data->user->uuid,
@@ -132,9 +141,8 @@ class ExtractController extends Controller
                     'cur_frozen_num' => $c2c_user_rich->frozen_num
                 ];
                 C2cRichLog::query()->create($log);
-                DB::commit();
-                
             }
+            DB::commit();
             return view('extract.edit',['data'=>$data,'flag'=>$data->c2c_coin->sys_name,'msg'=>'审核成功']);
         }catch (\Exception $exception){
             DB::rollBack();
