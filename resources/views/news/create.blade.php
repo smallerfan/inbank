@@ -1,9 +1,9 @@
 {{-- \resources\views\permissions\create.blade.php --}}
-@extends('base.base')
+@extends('layouts.app')
 
 @section('title', '| Create Permission')
 
-@section('base')
+@section('content')
     <style>
         .start-date , .end-date{
             display: none;
@@ -11,22 +11,22 @@
     </style>
     <div class='col-lg-10'>
 
-        @include('UEditor::head');    <!-- 加载编辑器的容器 -->
+        @include('UEditor::head')   <!-- 加载编辑器的容器 -->
         <h3><i class='fa fa-key'></i>添加公告</h3>
         <br>
         {{ Form::open(array('url' => route('news.store'))) }}
         {{ csrf_field() }}
         {{ method_field('POST') }}
         <div class="form-group">
-            {{ Form::label('title_cn', '名称[cn]') }}
+            {{ Form::label('title_cn', '标题') }}
             {{ Form::text('title_cn', null , array('class' => 'form-control')) }}
         </div>
         {{--<div class="form-group">--}}
-            {{--{{ Form::label('title_hk', '名称[hk]') }}--}}
+            {{--{{ Form::label('title_hk', '标题[hk]') }}--}}
             {{--{{ Form::text('title_hk', null , array('class' => 'form-control')) }}--}}
         {{--</div>--}}
         {{--<div class="form-group">--}}
-            {{--{{ Form::label('title_en', '名称[en]') }}--}}
+            {{--{{ Form::label('title_en', '标题[en]') }}--}}
             {{--{{ Form::text('title_en', null , array('class' => 'form-control')) }}--}}
         {{--</div>--}}
         <div class="form-group">
@@ -43,7 +43,7 @@
             {{ Form::date('end_time', \Carbon\Carbon::tomorrow(), array('class' => 'form-control end-date')) }}
         </div>
         <div>
-            <label>内容[cn]</label>
+            <label>内容</label>
             <script id="container" name="content_cn" type="text/plain">
             </script>
         </div>
@@ -72,17 +72,17 @@
         var ue = UE.getEditor('container');
         ue.ready(function () {
             //此处为支持laravel5 csrf ,根据实际情况修改,目的就是设置 _token 值.
-            ue.execCommand('serverparam', '_token', TOKEN);
+            ue.execCommand('serverparam', '_token', _token);
         });
         var ue1 = UE.getEditor('container1');
         ue1.ready(function () {
             //此处为支持laravel5 csrf ,根据实际情况修改,目的就是设置 _token 值.
-            ue.execCommand('serverparam', '_token', TOKEN);
+            ue.execCommand('serverparam', '_token', _token);
         });
         var ue2 = UE.getEditor('container2');
         ue2.ready(function () {
             //此处为支持laravel5 csrf ,根据实际情况修改,目的就是设置 _token 值.
-            ue.execCommand('serverparam', '_token', TOKEN);
+            ue.execCommand('serverparam', '_token', _token);
         });
     </script>
 

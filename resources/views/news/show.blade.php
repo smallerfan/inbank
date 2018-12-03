@@ -1,16 +1,16 @@
-@extends('base.base')
+@extends('layouts.app')
 
 @section('title', '| 查看 公告')
 
-@section('base')
-    <div class='col-lg-12'>
+@section('content')
+    <div class='col-lg-10'>
         <h3><i class='fa fa-key'></i> 查看公告——{{$new->title_cn}}</h3>
         <br>
         <div class="table-responsive">
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th width="33%">标题[cn]</th>
+                        <th width="33%">标题</th>
                         {{--<th width="33%">标题[hk]</th>--}}
                         {{--<th width="33%">标题[en]</th>--}}
                     </tr>
@@ -24,7 +24,7 @@
                 </tbody>
                 <thead>
                     <tr>
-                        <th width="33%">内容[cn]</th>
+                        <th width="33%">内容</th>
                         {{--<th width="33%">内容[hk]</th>--}}
                         {{--<th width="33%">内容[en]</th>--}}
                     </tr>

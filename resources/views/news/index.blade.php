@@ -1,13 +1,16 @@
 {{-- \resources\views\permissions\index.blade.php --}}
-@extends('base.base')
+@extends('layouts.app')
 
 @section('title', '| Permissions')
 
-@section('base')
+@section('content')
 <style>
     td,th{
         font-size: 16px;
         text-align: center;
+    }
+    .title{
+        text-align: left;
     }
     table tbody tr td{text-align: center;}
 </style>
@@ -21,7 +24,7 @@
                 <thead>
                 <tr>
                     <th width="3%">ID</th>
-                    <th width="16%">标题【cn】</th>
+                    <th width="16%">标题</th>
                     <th width="5%">类型</th>
                     <th colspan="2" width="10%">状态</th>
                     <th width="13%">创建时间</th>
@@ -32,7 +35,7 @@
                 @foreach ($datas as $data)
                     <tr>
                         <td>{{ $data->id }}</td>
-                        <td>{{ $data->title_cn }}</td>
+                        <td class="title">{{ $data->title_cn }}</td>
                         <td>{{ \App\Models\News::TYPE[$data->news_type] }}</td>
 
                         <td>

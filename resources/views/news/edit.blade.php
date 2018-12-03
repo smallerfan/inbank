@@ -1,15 +1,14 @@
-@extends('base.base')
+@extends('layouts.app')
 
 @section('title', '| 编辑 公告')
 
-@section('base')
+@section('content')
     <style>
         .start-date , .end-date{
             display: none;
         }
-        #
     </style>
-    @include('UEditor::head');    <!-- 加载编辑器的容器 -->
+    @include('UEditor::head')   <!-- 加载编辑器的容器 -->
     <div class='col-lg-10'>
 
         <h3><i class='fa fa-key'></i> 编辑公告——{{$new->title_cn}}</h3>
@@ -18,7 +17,7 @@
         {{ csrf_field() }}
         {{ Form::hidden('id', $new->id) }}
         <div class="form-group">
-            {{ Form::label('title_cn', '标题[cn]') }}
+            {{ Form::label('title_cn', '标题') }}
             {{ Form::text('title_cn', $new->title_cn, array('class' => 'form-control')) }}
         </div>
         {{--<div class="form-group">--}}
@@ -49,7 +48,7 @@
             {{ Form::date('end_time', substr($new->end_time,0,10), array('class' => 'form-control end-date')) }}
         </div>
         <div>
-            <label>内容[cn]</label>
+            <label>内容</label>
             <script id="container" name="content_cn" type="text/plain">
 {!! html_entity_decode($new->content_cn) !!}
             </script>
@@ -85,17 +84,17 @@
         var ue = UE.getEditor('container');
         ue.ready(function () {
             //此处为支持laravel5 csrf ,根据实际情况修改,目的就是设置 _token 值.
-            ue.execCommand('serverparam', '_token', TOKEN);
+            ue.execCommand('serverparam', '_token', _token);
         });
         var ue1 = UE.getEditor('container1');
         ue1.ready(function () {
             //此处为支持laravel5 csrf ,根据实际情况修改,目的就是设置 _token 值.
-            ue.execCommand('serverparam', '_token', TOKEN);
+            ue.execCommand('serverparam', '_token', _token);
         });
         var ue2 = UE.getEditor('container2');
         ue2.ready(function () {
             //此处为支持laravel5 csrf ,根据实际情况修改,目的就是设置 _token 值.
-            ue.execCommand('serverparam', '_token', TOKEN);
+            ue.execCommand('serverparam', '_token', _token);
         });
     </script>
     <script type="text/javascript">

@@ -41,6 +41,7 @@
                     <div class="card">
                         <div class="card-body">
                             <h4 class="card-title">审核{{ $data->c2c_coin->sys_name }}信息——{{ $data->user->invite_code }}</h4>
+                            {{ Form::open(array('url' => route('extract.update'))) }}
                             <table class="table table-bordered table-striped">
                                 <thead>
                                 <tr>
@@ -75,7 +76,6 @@
                                     </th>
                                 </tr>
                                 @if($data->status == 'wait_approval')
-                                    {{ Form::open(array('url' => route('extract.update'))) }}
                                     {{ Form::hidden('id', $data->id) }}
                                     <tr>
                                         <th class="head">审核类型: </th>
@@ -94,7 +94,6 @@
                                         <th colspan="2" class="th-save">
                                             {{ Form::submit('保存', array('class' => 'btn btn-primary')) }}
 
-                                            {{ Form::close() }}
                                         </th>
                                     </tr>
                                 @elseif($data->status == 'reject_approval')
@@ -107,6 +106,7 @@
                                 @endif
                                 </thead>
                             </table>
+                            {{ Form::close() }}
                         </div>
                     </div>
                 </div>
