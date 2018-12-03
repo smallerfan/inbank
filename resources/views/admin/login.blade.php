@@ -20,7 +20,7 @@
           <div class="col-lg-4 mx-auto">
             <div class="auth-form-light text-left p-5">
               <div class="brand-logo">
-                <img src="{{ getConfig("admin_logo") }}">
+                <img src="{{ config('filesystems.disks.qiniu.domain').getConfig("admin_logo") }}">
               </div>
               <form class="pt-3">
                 <div class="form-group">

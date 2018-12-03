@@ -80,10 +80,6 @@
                                 @foreach ($users as $user)
                                     <tr>
                                         <th scope="row">{{ $user->id }}</th>
-                                        {{--<td style="text-align: left">--}}
-                                        {{--<label>UID: {{ $user->invite_code }}</label>--}}
-                                        {{--<label>手机号: {{ $user->account }}</label>--}}
-                                        {{--</td>--}}
                                         <td>{{ $user->invite_code  }}</td>
                                         <td>{{ $user->account }}</td>
                                         <td>{{ $user->direct_user_count() }}</td>
@@ -103,31 +99,16 @@
                                         </td>
                                         <td>{{ \App\Models\User::STATUS[$user->status] }}</td>
                                         <td>{{ $user->m_user->dictionaries->dic_item_name}}</td>
-                                        {{--<td style="text-align: left">--}}
-                                        {{--活DK: {{ $user->user_rich ? $user->user_rich->live_dk_num : '0' }} <br/>--}}
-                                        {{--冻DK: {{ $user->user_rich ? $user->user_rich->frozen_dk_num : '0' }} <br/>--}}
-                                        {{--活DN: {{ $user->user_rich ? $user->user_rich->dn_num : '0' }}<br/>--}}
-                                        {{--活DN: {{ $user->user_rich ? $user->user_rich->frozen_dn_num : '0' }}--}}
-                                        {{--</td>--}}
                                         <td>{{ $user->created_at }}</td>
                                         <td style="text-align: center;">
 
                                             <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
-                                                {{--@if (!$user->is_deleted())--}}
-                                                {{--<a class="btn btn-link" href="{{ route('user_riches.new', $user) }}">财富</a>--}}
-
-                                                {{--@endif--}}
-                                                {{--@if (!$user->is_deleted())--}}
-                                                {{--<a class="btn btn-link" href="{{ route('user_riches.dk_logs', $user) }}">财富明细</a>--}}
                                                 <a href="{{ route('users.edit', $user) }}" class="btn btn-sm btn-gradient-dark btn-icon-text" style="margin-right: 3px">编辑
                                                     <i class="mdi mdi-file-check btn-icon-append"></i></a>
                                                 <form action="{{ route('users.destroy', $user) }}" method="post">
                                                     {{ csrf_field() }}
                                                     {{ method_field('DELETE') }}
-
-                                                    {{--<button type="submit" class="btn btn-link">删除</button>--}}
                                                 </form>
-                                                {{--@endif--}}
                                             </div>
                                         </td>
                                     </tr>
@@ -148,14 +129,4 @@
         </div>
 
     </div>
-    {{--<div>--}}
-        {{--<h3><i class="fa fa-user"></i>用户列表</h3>--}}
-
-        {{--<hr>--}}
-
-
-        {{--<div class="table-responsive">--}}
-           {{----}}
-        {{--</div>--}}
-    {{--</div>--}}
 @endsection

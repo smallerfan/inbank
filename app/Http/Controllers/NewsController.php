@@ -16,20 +16,27 @@ use App\Models\News;
         $status['close'] = '关闭';
         return view('news.create')->with('status',$status);
     }
-    public function store(Request $request){
-        $this->validate($request,
+    public function add(Request $request){
+        $params = $request->all();
+        $validator = \Validator::make(
+            $params,
             [
                 'title_cn'=>'required|max:40',
-                'title_hk'=>'nullable|max:40',
-                'title_en'=>'nullable|max:80',
-                'news_type'=>'required|in:common,urgent',
+                'news_type'=>'required',
                 'content_cn'=>'required',
-                'content_hk'=>'nullable',
-                'content_en' => 'nullable',
-                'status' => 'required|string|in:open,close',
-                'start_time' => 'nullable|date|required_if:news_type,urgent',
-                'end_time' => 'nullable|date|after_or_equal:start_time|required_if:news_type,urgent',
-            ]);
+            ],
+            [
+                'required' => ':attribute必填',
+                'max' => ':attribute最大值',
+            ],[
+                'title_cn' => '标题',
+                'news_type' => '公告类型',
+                'content_cn' => '内容',
+            ]
+        );
+        if($validator->fails()){
+            return $this->json(500,$validator->messages()->first());
+        }
         if($request->news_type == 'common'){
             News::query()->create([
                 'title_cn' => $request->title_cn,
@@ -56,28 +63,39 @@ use App\Models\News;
                 'end_time' => $request->end_time
             ]);
         }
-        
-        return redirect()->route("news.index")->with('flash_message','添加成功');
+        return $this->json(200,'添加成功');
     }
     public function edit(News $news){
         $new = News::query()->find($news->id);
         return view('news.edit')->with('new',$new);
     }
-    public function update(Request $request){
-        $this->validate($request,
+    public function updateNews(Request $request){
+        $params = $request->all();
+        $validator = \Validator::make(
+            $params,
             [
                 'title_cn'=>'required|max:40',
-                'title_hk'=>'nullable|max:40',
-                'title_en'=>'nullable|max:80',
-                'news_type'=>'required|in:common,urgent,site',
+                'news_type'=>'required',
                 'content_cn'=>'required',
-                'content_hk'=>'nullable',
-                'content_en' => 'nullable',
-                'status' => 'nullable|string|in:open,close,null',
-                'start_time' => 'nullable|date|required_if:news_type,urgent,site',
-                'end_time' => 'nullable|date|after_or_equal:start_time|required_if:news_type,urgent,site',
+            ],
+            [
+                'required' => ':attribute必填',
+                'max' => ':attribute最大值',
+            ],[
+                'title_cn' => '标题',
+                'news_type' => '公告类型',
+                'content_cn' => '内容',
+            ]
+        );
+        if($validator->fails()){
+            return $this->json(500,$validator->messages()->first());
+        }
+        $this->validate($request,
+            [
+
             ]);
         $id = $request->id;
+//        dd($id);
         $new = News::query()->find($id);
         if($request->news_type == 'common'){
             $new->where('id',$request->id)->update([
@@ -104,21 +122,28 @@ use App\Models\News;
                 'end_time' => $request->end_time
             ]);
         }
-        
-        return redirect()->route("news.index")->with('flash_message','保存成功');
+        return $this->json(200,'修改成功');
+//        return redirect()->route("news.index")->with('flash_message','保存成功');
     
     }
     public function show(News $news){
         $new = News::query()->find($news->id);
         return view('news.show')->with('new',$new);
     }
-    public function destroy($id){
+
+    public function delete(Request $request){
+        $id = $request->input('id');
+//        dd($id);
         $news = News::query()->find($id);
         if($news){
-            $news -> delete();
-            return redirect()->route("news.index")->with('flash_message','删除成功');
+            $res = $news->delete();
+            if($res){
+                return $this->json(200,'删除成功');
+//                return redirect()->route("banners.index")->with('flash_message','删除成功');
+            }
+            return $this->json(500,'删除失败');
         }else{
-            return redirect()->route("news.index")->with('flash_message','删除失败');
+            return $this->json(500,'不存在此轮播图');
         }
     }
     public function set_open($news_id) {

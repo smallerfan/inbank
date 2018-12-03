@@ -1,101 +1,133 @@
-@extends('layouts.app')
-
-@section('title', '| 编辑 公告')
-
-@section('content')
+@extends('base.base')
+@section('base')
     <style>
         .start-date , .end-date{
             display: none;
         }
     </style>
-    @include('UEditor::head')   <!-- 加载编辑器的容器 -->
-    <div class='col-lg-10'>
 
-        <h3><i class='fa fa-key'></i> 编辑公告——{{$new->title_cn}}</h3>
-        <br>
-        {{ Form::model($new,  ['route' => ['news.update', $new], 'method' => 'POST']) }}
-        {{ csrf_field() }}
-        {{ Form::hidden('id', $new->id) }}
-        <div class="form-group">
-            {{ Form::label('title_cn', '标题') }}
-            {{ Form::text('title_cn', $new->title_cn, array('class' => 'form-control')) }}
-        </div>
-        {{--<div class="form-group">--}}
-            {{--{{ Form::label('title_hk', '标题[hk]') }}--}}
-            {{--{{ Form::text('title_hk', $new->title_hk, array('class' => 'form-control')) }}--}}
-        {{--</div>--}}
-        {{--<div class="form-group">--}}
-            {{--{{ Form::label('title_en', '标题[en]') }}--}}
-            {{--{{ Form::text('title_en', $new->title_en, array('class' => 'form-control')) }}--}}
-        {{--</div>--}}
-        <div class="form-group">
-            <label>类型</label>&emsp;
-            @if($new->news_type == 'site')
+    <div class="main-panel">
+        <div class="content-wrapper">
+            <div class="page-header">
+                <h3 class="page-title">
+                    <span class="page-title-icon bg-gradient-primary text-white mr-2">
+                        <i class="mdi mdi-wrench"></i>
+                    </span>
+                    商城
+                </h3>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{url('/news')}}">公告列表</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">编辑公告</li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">编辑公告——{{$new->title_cn}}</h4>
+                            {{ Form::model($new,  ['route' => ['news.update', $new], 'method' => 'POST','id'=>'form']) }}
+                            {{ csrf_field() }}
+                            {{ Form::hidden('id', $new->id) }}
+                            <div class="form-group">
+                                {{ Form::label('title_cn', '标题') }}
+                                {{ Form::text('title_cn', $new->title_cn, array('class' => 'form-control')) }}
+                            </div>
+                            <div class="form-inline">
+                                <label>类型</label>&emsp;
+                                @if($new->news_type == 'site')
+                                    {{ Form::label('start_time', '类型：') }}
+                                    <div class="form-check form-check-primary">
+                                        <label class="form-check-label">
+                                            <input type="radio" class="form-check-input" name="news_type" id="site" value="site" @if($new->news_type == 'site')checked="checked"@endif>
+                                            网站维护&emsp;
+                                            <i class="input-helper"></i></label>
+                                    </div>
+                                @else
+                                    <div class="form-check form-check-primary">
+                                        <label class="form-check-label">
+                                            <input type="radio" class="form-check-input" name="news_type" id="common" @if($new->news_type == 'common')checked="checked" @endif value="common" >
+                                            普通&emsp;
+                                            <i class="input-helper"></i></label>
+                                    </div>
+                                    <div class="form-check form-check-danger">
+                                        <label class="form-check-label">
+                                            <input type="radio" class="form-check-input" name="news_type" id="urgent" value="urgent"  @if($new->news_type == 'urgent')checked="checked"@endif>
+                                            紧急
+                                            <i class="input-helper"></i></label>
+                                    </div>
 
-                <input type="radio" value="site" id="site" name="news_type" @if($new->news_type == 'site')checked="checked"@endif>网站维护&emsp;
+                                @endif
+                            </div>
+                            <div class="form-group start-date">
+                                {{ Form::label('start_time', '开始时间') }}
+                                {{ Form::date('start_time',substr($new->start_time,0,10) , array('class' => 'form-control start-date')) }}
+                            </div>
+                            <div class="form-group end-date">
+                                {{ Form::label('end_time', '结束时间') }}
+                                {{ Form::date('end_time', substr($new->end_time,0,10), array('class' => 'form-control end-date')) }}
+                            </div>
+                            <div>
+                                <label>内容</label>
+                                {{ Form::label('editor', '公告内容：') }}
+                                <textarea  placeholder="请在此处编辑内容"  id="editor" name="content_cn" style="height:400px;max-height:400px;">
+                                    {!! html_entity_decode($new->content_cn) !!}
+                                </textarea >
+                            </div>
+                            <div class="form-inline" id="status">
+                                {{ Form::label('editor', '状态：') }}
+                                @if($new->news_type != 'site')
+                                <div class="form-check form-check-primary">
+                                    <label class="form-check-label">
+                                        <input type="radio" class="form-check-input" name="status" id="ExampleRadio1" @if($new->status == 'open')checked="checked"@endif value="open">
+                                        开启&emsp;
+                                        <i class="input-helper"></i></label>
+                                </div>
+                                <div class="form-check form-check-primary">
+                                    <label class="form-check-label">
+                                        <input type="radio" class="form-check-input" name="status" id="ExampleRadio1" @if($new->status == 'close')checked="checked"@endif value="close">
+                                        关闭
+                                        <i class="input-helper"></i></label>
+                                </div>
+                                @endif
+                            </div>
+                            <button type="button" onclick="commit()" class="btn btn-sm btn-gradient-primary btn-icon-text">
+                                <i class="mdi mdi-file-check btn-icon-prepend"></i>
+                                提交
+                            </button>
 
-            @else
-                <input type="radio" value="common" id="common" name="news_type" @if($new->news_type == 'common')checked="checked"@endif>普通&emsp;
-                <input type="radio" value="urgent" id="urgent" name="news_type" @if($new->news_type == 'urgent')checked="checked"@endif>紧急&emsp;
-            @endif
+                            {{ Form::close() }}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="form-group start-date">
-            {{ Form::label('start_time', '开始时间') }}
-            {{ Form::date('start_time',substr($new->start_time,0,10) , array('class' => 'form-control start-date')) }}
-        </div>
-        <div class="form-group end-date">
-            {{ Form::label('end_time', '结束时间') }}
-            {{ Form::date('end_time', substr($new->end_time,0,10), array('class' => 'form-control end-date')) }}
-        </div>
-        <div>
-            <label>内容</label>
-            <script id="container" name="content_cn" type="text/plain">
-{!! html_entity_decode($new->content_cn) !!}
-            </script>
-        </div>
-        {{--<div class="form-group">--}}
-            {{--<label>内容[hk]</label>--}}
-            {{--<script id="container1" name="content_hk" type="text/plain">--}}
-{{--{!! html_entity_decode($new->content_hk) !!}--}}
-            {{--</script>--}}
-        {{--</div>--}}
-        {{--<div class="form-group">--}}
-            {{--<label>内容[en]</label>--}}
-            {{--<script id="container2" name="content_en" type="text/plain">--}}
-{{--{!! html_entity_decode($new->content_en) !!}--}}
-            {{--</script>--}}
-        {{--</div>--}}
-        <div class="form-group" id="status">
-            <label>状态</label>
-            @if($new->news_type != 'site')
-            <input type="radio" value="open" id="open" name="status" @if($new->status == 'open')checked="checked"@endif>开启&emsp;
-            <input type="radio" value="close" id="close" name="status" @if($new->status == 'close')checked="checked"@endif>关闭
-            @else
-                <input type="radio" value="null" name="status" checked="checked">开启&emsp;
-            @endif
-        </div>
-        {{ Form::submit('保存', array('class' => 'btn btn-primary')) }}
-
-        {{ Form::close() }}
 
     </div>
     <script type="text/javascript" src="{{ asset('js/jquery-3.2.1.min.js') }}"></script>
     <script type="text/javascript">
-        var ue = UE.getEditor('container');
-        ue.ready(function () {
-            //此处为支持laravel5 csrf ,根据实际情况修改,目的就是设置 _token 值.
-            ue.execCommand('serverparam', '_token', _token);
-        });
-        var ue1 = UE.getEditor('container1');
-        ue1.ready(function () {
-            //此处为支持laravel5 csrf ,根据实际情况修改,目的就是设置 _token 值.
-            ue.execCommand('serverparam', '_token', _token);
-        });
-        var ue2 = UE.getEditor('container2');
-        ue2.ready(function () {
-            //此处为支持laravel5 csrf ,根据实际情况修改,目的就是设置 _token 值.
-            ue.execCommand('serverparam', '_token', _token);
-        });
+        var editor = new wangEditor('editor');
+        // 上传图片（举例）
+        editor.config.uploadImgUrl = "/admin/wangeditor/upload";
+        // 隐藏掉插入网络图片功能。该配置，只有在你正确配置了图片上传功能之后才可用。
+        editor.config.hideLinkImg = false;
+        editor.create();
+        function commit(){
+            if(!checkForm()){
+                return false;
+            }
+            var data = $("#form").serializeObject();
+//            console.info(data);
+            myRequest("/news/update_news","post",data,function(res){
+                layer.msg(res.msg)
+                setTimeout(function(){
+                    window.location="/news";
+                },1500)
+            },function(){
+                layer.msg(res.msg, function(){});
+            });
+        }
     </script>
     <script type="text/javascript">
         $(document).ready(function(){

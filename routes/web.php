@@ -63,6 +63,8 @@ Route::group(['middleware'=>'rbac'], function () use($router) {
     $router->get('users/show/{id}', 'UsersController@show')->where(['id' => '[0-9]+'])->name('users.show');
     $router->post('users/searchUser', 'UsersController@searchUser')->name('users.searchUser');
     $router->post('users/move_line', 'UsersController@move_line')->name('users.move_line');
+    $router->get('users/getChildArea', 'UsersController@getChildArea')->name('users.getChildArea');
+
 
     $router->resource("users", 'UsersController');
     $router->post("user/user_find", 'UsersController@userFind')->name('user.user_find');
@@ -202,7 +204,9 @@ Route::group(['middleware'=>'rbac'], function () use($router) {
     $router->post('complaints/read/{id}', 'ComplaintController@read')->where(['id' => '[0-9]+'])->name('complaints.read');
     //公告
     $router->resource('news', 'NewsController');
-    $router->post('news/update', 'NewsController@update')->where(['id' => '[0-9]+'])->name('news.update');
+    $router->post('news/delete_news', 'NewsController@delete')->name('news.delete_news');
+    $router->post('news/add', 'NewsController@add')->name('news.add');
+    $router->post('news/update_news', 'NewsController@updateNews')->name('news.update_news');
     $router->post('news/set_open/{id}', 'NewsController@set_open')->where(['id' => '[0-9]+'])->name('news.set_open');
     $router->post('news/set_close/{id}', 'NewsController@set_close')->where(['id' => '[0-9]+'])->name('news.set_close');
     //认购

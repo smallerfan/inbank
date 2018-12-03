@@ -140,34 +140,6 @@
             }
         })
     }
-//    function del(id){
-//        myConfirm("删除操作不可逆,是否继续?",function(){
-//            myRequest("/admin/role/del/"+id,"post",{},function(res){
-//                layer.msg(res.msg)
-//                setTimeout(function(){
-//                    window.location.reload();
-//                },1500)
-//            },function(){
-//                layer.msg(res.msg, function(){});
-//            });
-//        });
-//    }
-
-    //input失去焦点时候
-    function lostFocus(id) {
-        var val = document.getElementById('sort'+id).value;
-        $.ajax({
-            type: 'POST',
-            url: "{{ route('goods.set_sort')}}",
-            dataType: 'json',
-            data: {'id': id, 'sort': val,'_token':'{{csrf_token()}}'},
-            success: function (data) {
-                if(data == 0){
-                    alert('设置失败');
-                }
-            }
-        });
-    }
 </script>
 
 @endsection

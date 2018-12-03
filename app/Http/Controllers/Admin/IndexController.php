@@ -279,7 +279,7 @@ class IndexController extends Controller
                 $img_main = UploadedFile::file('wangEditorH5File')->store();
 //                $bool = Storage::disk('admin')->put('/wangeditor/'.$filename, file_get_contents($realPath));
                 if($img_main){
-                    echo asset($img_main);
+                    echo asset(config('filesystems.disks.qiniu.domain').$img_main);
                 }else{
                     echo 'error|上传失败';
                 }

@@ -1,7 +1,4 @@
 @extends('base.base')
-
-@section('title', '| 审核 提取信息')
-
 @section('base')
     <style>
         .tr-note {

@@ -1,89 +1,117 @@
-{{-- \resources\views\permissions\create.blade.php --}}
-@extends('layouts.app')
-
-@section('title', '| Create Permission')
-
-@section('content')
+@extends('base.base')
+@section('base')
     <style>
         .start-date , .end-date{
             display: none;
         }
     </style>
-    <div class='col-lg-10'>
+    <div class="main-panel">
+        <div class="content-wrapper">
+            <div class="page-header">
+                <h3 class="page-title">
+                    <span class="page-title-icon bg-gradient-primary text-white mr-2">
+                        <i class="mdi mdi-wrench"></i>
+                    </span>
+                    商城
+                </h3>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{url('/news')}}">公告列表</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">添加公告</li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">添加公告</h4>
+                            <br>
+                            {{ Form::open(array('url' => route('news.store'),'id'=>'form')) }}
+                            {{ csrf_field() }}
+                            {{ method_field('POST') }}
+                            <div class="form-group">
+                                {{ Form::label('title_cn', '标题') }}
+                                {{ Form::text('title_cn', null , array('class' => 'form-control')) }}
+                            </div>
+                            <div class="form-inline">
+                                {{ Form::label('start_time', '类型：') }}
+                                <div class="form-check form-check-primary">
+                                    <label class="form-check-label">
+                                        <input type="radio" class="form-check-input" name="news_type" id="ExampleRadio1" checked value="common" onclick="commons()">
+                                        普通&emsp;
+                                        <i class="input-helper"></i></label>
+                                </div>
+                                <div class="form-check form-check-danger">
+                                    <label class="form-check-label">
+                                        <input type="radio" class="form-check-input" name="news_type" id="ExampleRadio1" value="urgent" onclick="urgent()">
+                                        紧急
+                                        <i class="input-helper"></i></label>
+                                </div>
+                            </div>
+                            <div class="form-group start-date">
+                                {{ Form::label('start_time', '开始时间：') }}
+                                {{ Form::date('start_time',\Carbon\Carbon::now() , array('class' => 'form-control start-date')) }}
+                            </div>
+                            <div class="form-group end-date">
+                                {{ Form::label('end_time', '结束时间：') }}
+                                {{ Form::date('end_time', \Carbon\Carbon::tomorrow(), array('class' => 'form-control end-date')) }}
+                            </div>
+                            <div>
+                                {{ Form::label('editor', '公告内容：') }}
+                                <textarea  placeholder="请在此处编辑内容"  id="editor" name="content_cn" style="height:400px;max-height:400px;"></textarea >
+                            </div>
+                            <div class="form-inline">
+                                {{ Form::label('editor', '状态：') }}
+                                <div class="form-check form-check-primary">
+                                    <label class="form-check-label">
+                                        <input type="radio" class="form-check-input" name="status" id="ExampleRadio1" checked value="open">
+                                        开启&emsp;
+                                        <i class="input-helper"></i></label>
+                                </div>
+                                <div class="form-check form-check-primary">
+                                    <label class="form-check-label">
+                                        <input type="radio" class="form-check-input" name="status" id="ExampleRadio1" value="close">
+                                        关闭
+                                        <i class="input-helper"></i></label>
+                                </div>
+                            </div>
 
-        @include('UEditor::head')   <!-- 加载编辑器的容器 -->
-        <h3><i class='fa fa-key'></i>添加公告</h3>
-        <br>
-        {{ Form::open(array('url' => route('news.store'))) }}
-        {{ csrf_field() }}
-        {{ method_field('POST') }}
-        <div class="form-group">
-            {{ Form::label('title_cn', '标题') }}
-            {{ Form::text('title_cn', null , array('class' => 'form-control')) }}
-        </div>
-        {{--<div class="form-group">--}}
-            {{--{{ Form::label('title_hk', '标题[hk]') }}--}}
-            {{--{{ Form::text('title_hk', null , array('class' => 'form-control')) }}--}}
-        {{--</div>--}}
-        {{--<div class="form-group">--}}
-            {{--{{ Form::label('title_en', '标题[en]') }}--}}
-            {{--{{ Form::text('title_en', null , array('class' => 'form-control')) }}--}}
-        {{--</div>--}}
-        <div class="form-group">
-            {{ Form::label('news_type', '类型') }}&emsp;
-            <input type="radio" value="common" class="common" name="news_type" onclick="commons()" checked>普通&emsp;
-            <input type="radio" value="urgent" class="urgent" name="news_type" onclick="urgent()">紧急
-        </div>
-        <div class="form-group start-date">
-            {{ Form::label('start_time', '开始时间') }}
-            {{ Form::date('start_time',\Carbon\Carbon::now() , array('class' => 'form-control start-date')) }}
-        </div>
-        <div class="form-group end-date">
-            {{ Form::label('end_time', '结束时间') }}
-            {{ Form::date('end_time', \Carbon\Carbon::tomorrow(), array('class' => 'form-control end-date')) }}
-        </div>
-        <div>
-            <label>内容</label>
-            <script id="container" name="content_cn" type="text/plain">
-            </script>
-        </div>
-        {{--<div class="form-group">--}}
-            {{--<label>内容[hk]</label>--}}
-            {{--<script id="container1" name="content_hk" type="text/plain">--}}
-            {{--</script>--}}
-        {{--</div>--}}
-        {{--<div class="form-group">--}}
-            {{--<label>内容[en]</label>--}}
-            {{--<script id="container2" name="content_en" type="text/plain">--}}
-            {{--</script>--}}
-        {{--</div>--}}
-        <div class="form-group">
-            {{ Form::label('status', '状态') }}
-            {{ Form::radio('status', 'open', 'checked') }}开启&emsp;
-            {{ Form::radio('status', 'close') }}关闭
-        </div>
+                            <button type="button" onclick="commit()" class="btn btn-sm btn-gradient-primary btn-icon-text">
+                                <i class="mdi mdi-file-check btn-icon-prepend"></i>
+                                提交
+                            </button>
 
-        {{ Form::submit('提交', array('class' => 'btn btn-primary')) }}
-
-        {{ Form::close() }}
+                            {{ Form::close() }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     </div>
     <script type="text/javascript">
-        var ue = UE.getEditor('container');
-        ue.ready(function () {
-            //此处为支持laravel5 csrf ,根据实际情况修改,目的就是设置 _token 值.
-            ue.execCommand('serverparam', '_token', _token);
-        });
-        var ue1 = UE.getEditor('container1');
-        ue1.ready(function () {
-            //此处为支持laravel5 csrf ,根据实际情况修改,目的就是设置 _token 值.
-            ue.execCommand('serverparam', '_token', _token);
-        });
-        var ue2 = UE.getEditor('container2');
-        ue2.ready(function () {
-            //此处为支持laravel5 csrf ,根据实际情况修改,目的就是设置 _token 值.
-            ue.execCommand('serverparam', '_token', _token);
-        });
+        var editor = new wangEditor('editor');
+        // 上传图片（举例）
+        editor.config.uploadImgUrl = "/admin/wangeditor/upload";
+        // 隐藏掉插入网络图片功能。该配置，只有在你正确配置了图片上传功能之后才可用。
+        editor.config.hideLinkImg = false;
+        editor.create();
+        function commit(){
+            if(!checkForm()){
+                return false;
+            }
+            var data = $("#form").serializeObject();
+//            console.info(data);
+            myRequest("/news/add","post",data,function(res){
+                layer.msg(res.msg)
+                setTimeout(function(){
+                    window.location="/news";
+                },1500)
+            },function(){
+                layer.msg(res.msg, function(){});
+            });
+        }
     </script>
 
     <script type="text/javascript">

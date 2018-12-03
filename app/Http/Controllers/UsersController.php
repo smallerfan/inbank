@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Authorizable;
+use App\Models\Area;
 use App\Models\Dictionaries;
 use App\Models\Muser;
 use App\Models\User;
@@ -143,7 +143,14 @@ class UsersController extends Controller
             ->whereIn('status',['enable','trans_lock'])
             ->count();
         $level = Dictionaries::all();
-        return view('users.edit',['user'=>$user,'all'=>$all,'lock'=>$lock,'unlock'=>$unlock,'level'=>$level]);
+        $provinces = Area::query()->where('level', 0)->get();
+        $cities = Area::query()->where(['parent_id'=>$user->province,'level'=>1])->get();
+        $areas = Area::query()->where(['parent_id'=>$user->city,'level'=>2])->get();
+        return view('users.edit',[
+                'user'=>$user,'all'=>$all,'lock'=>$lock,
+                'unlock'=>$unlock,'level'=>$level,
+                'provinces'=>$provinces,'cities'=>$cities,'areas'=>$areas]
+        );
     }
     public function update(Request $request) {
         $id = $request->id;
@@ -155,6 +162,9 @@ class UsersController extends Controller
                 'account'=>'required|regex:/^1\d{10}$/',
                 'status'=>'required|in:enable,deleted,lock,trans_lock',
                 'level'=>'required',
+                'province'=>'required|integer',
+                'city'=>'required|integer',
+                'area'=>'required|integer',
             ]);
         $account = $request->account;
         $mobile = User::query()
@@ -165,14 +175,22 @@ class UsersController extends Controller
             return view('users.edit')->with(['user'=>$user,'account'=>$account,'msg'=>'新手机号已被使用']);
         }
         $status = $request->status;
+        $province = $request->province;
+        $city = $request->city;
+        $area = $request->area;
 
         $user->account=$account;
         $user->mobile=$account;
         $user->status=$status;
+        //省市区
+        $user->province=$province;
+        $user->city=$city;
+        $user->county=$area;
 //        if($auth_id  == 1){
 //            $grade = $request->grade;
 //            $user->user_grade=$grade;
 //        }
+//        dd($user);
         $user->save();
 //        dd($user->id);
         $level_save = Muser::changeLevel($id,$level);
@@ -182,7 +200,17 @@ class UsersController extends Controller
 //        dd($request->segment(2));
         return view('users.relation');
     }
-
+    public function getChildArea(Request $request)
+    {
+        $id = $request->id;
+        $level = $request->level;
+        $area = Area::query()->find($id);
+        if (empty($area)) {
+            return json_encode(-1);
+        }
+        $children = Area::query()->where(['parent_id'=>$area->id,'level'=>$level])->get();
+        return json_encode($children);
+    }
     public function lock_line(Request $request){
         $id = $request->id;
         $user = User::query()->find($id);

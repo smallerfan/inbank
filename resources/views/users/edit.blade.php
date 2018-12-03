@@ -118,24 +118,7 @@
                                                     <i class="input-helper"></i>
                                                 </label>
                                             </div>
-                                            {{--@if($user->user_grade == 'interim')--}}
-
                                         @endforeach
-                                        {{--<input type="radio" name="grade" value="svip">&nbsp;SVIP--}}
-                                        {{--@endif--}}
-                                        {{--@if($user->user_grade == 'common')--}}
-                                        {{--<input type="radio" name="grade" @if($user->user_grade == 'common') checked="checked" @endif value="common">&nbsp;合格&emsp;--}}
-
-                                        {{--<input type="radio" name="grade" value="svip">&nbsp;SVIP--}}
-                                        {{--@endif--}}
-                                        {{--@if($user->user_grade == 'vip')--}}
-                                        {{--<input type="radio" name="grade" @if($user->user_grade == 'vip') checked="checked" @endif value="common">&nbsp;合格&emsp;--}}
-                                        {{--<input type="radio" name="grade" value="svip">&nbsp;SVIP--}}
-                                        {{--@endif--}}
-                                        {{--@if($user->user_grade == 'svip')--}}
-                                        {{--<input type="radio" name="grade" value="common">&nbsp;合格&emsp;--}}
-                                        {{--<input type="radio" name="grade" @if($user->user_grade == 'svip') checked="checked" @endif value="svip">&nbsp;SVIP--}}
-                                        {{--@endif--}}
                                     </th>
                                 </tr>
                                 <tr>
@@ -147,6 +130,39 @@
                                         @else
                                         &emsp;无
                                         @endif
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th class="head">注册地址: </th>
+                                    <th>
+                                        <div class="form-inline">
+                                        <select name="province" id="province" onchange="getChildArea(1)" class="form-control">
+                                            @foreach($provinces as $province)
+                                                <option value="{{ $province->id }}"
+                                                        @if($province->id == 0)
+                                                        selected="selected" disabled="disabled"
+                                                        @elseif($province->id == $user->province)
+                                                        selected="selected"
+                                                        @endif>
+                                                    {{ $province->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <select name="city" id="city" onchange="getChildArea(2)" class="form-control">
+                                            @foreach($cities as $city)
+                                                <option value="{{ $city->id }}" @if($city->id == $user->city)selected="selected"@endif>
+                                                    {{ $city->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <select name="area" id="area" class="form-control">
+                                            @foreach($areas as $area)
+                                                <option value="{{ $area->id }}" @if($area->id == $user->county)selected="selected"@endif>
+                                                    {{ $area->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        </div>
                                     </th>
                                 </tr>
                                 <tr>
@@ -191,6 +207,36 @@
             }else{
                 return false;
             }
+        }
+        function getChildArea(type) {
+            if(type == 1){
+                var id = $('#province').val();
+            }
+            if(type == 2){
+                var id = $('#city').val();
+            }
+            $.ajax({
+                type: "get",
+                url: "{{ route('users.getChildArea') }}",
+                data: {id:id,level:type},
+                dataType: "json",
+                success: function(data){
+                    optionstring = '';
+                    $.each(data,function(key,value){  //循环遍历后台传过来的json数据
+                        optionstring += "<option value=\"" + value.id + "\" >" + value.name + "</option>";
+                    });
+                    if(type == 1){
+                        $("#city").html("<option selected disabled>请选择市</option> "+optionstring);
+                    }
+                    if(type == 2){
+                        $("#area").html("<option selected disabled>请选择区/县</option> "+optionstring);
+                    }
+                },
+                error:function (error) {
+                    console.log(error);
+                }
+            });
+
         }
     </script>
 @endsection
